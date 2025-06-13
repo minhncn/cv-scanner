@@ -1,5 +1,6 @@
 import re
 import requests
+import os
 
 def extract_drive_file_id(drive_url):
     """Extracts the file ID from a Google Drive URL."""
@@ -16,7 +17,7 @@ def download_pdf_from_google_drive(file_id):
     Downloads a PDF file from Google Drive given its file ID.
     Returns (file_bytes, filename)
     """
-    URL = "https://drive.google.com/uc?export=download"
+    URL = os.getenv("GOOGLE_DRIVE_URL")
     session = requests.Session()
     response = session.get(URL, params={'id': file_id}, stream=True)
     if 'Content-Disposition' in response.headers:
