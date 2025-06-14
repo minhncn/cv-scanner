@@ -10,7 +10,7 @@ def extract_text_from_pdf(file):
         text += page.get_text("text") or ""
     pdf_document.close()
     # Save raw text to a file for record-keeping
-    with open("cv_input/raw_cv_texts.txt", "a", encoding="utf-8") as f:
+    with open("services/raw_cv_texts.txt", "a", encoding="utf-8") as f:
         f.write("----- NEW CV -----\n")
         f.write(text)
         f.write("\n\n")

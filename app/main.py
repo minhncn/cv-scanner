@@ -1,7 +1,6 @@
 from fastapi import FastAPI
 import logging
 from api.routes import router
-from models.models import Candidate, WorkExperience, RawCV
 
 logging.basicConfig(level=logging.DEBUG)
 

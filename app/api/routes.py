@@ -3,10 +3,10 @@ from fastapi.responses import JSONResponse
 from pydantic import BaseModel
 import json
 import logging
-from database_manager import init_db, init_chromadb
+from db.database_manager import init_db, init_chromadb
 from sqlalchemy.orm import Session
-from cv_input.cv_processor import extract_text_from_pdf, process_cv_to_json
-from cv_input.get_file_google_drive import download_pdf_from_google_drive, extract_drive_file_id
+from services.cv_processor import extract_text_from_pdf, process_cv_to_json
+from services.get_file_google_drive import download_pdf_from_google_drive, extract_drive_file_id
 from models.models import Candidate, WorkExperience, RawCV
 
 # Set up logging
