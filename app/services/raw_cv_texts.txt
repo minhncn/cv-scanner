@@ -133,3 +133,54 @@ University (2019)
 SUMMARY
 
 
+----- NEW CV -----
+Nguyen Van Tu Cuong 
+Phone: (+84) 0828.678.897 | Email: tucuong1832002@gmail.com  
+SUMMARY 
+I am a person who loves providing solutions to hard problems when making software, especially in 
+back-end development.  I love to learn new things, work well under pressure, consistently meet 
+deadlines and targets while delivering high-quality work. 
+EDUCATION 
+• FPT University, BSc. In Software Engineering 
+             ○ Major GPA: 8.6 
+             ○ Courses taken: Object Oriented Programming, Data Structure and Algorithms, Web Design, Software 
+Engineering, Operating Systems, Computer Networks, Database Systems. 
+PROFESSIONAL EXPERIENCE 
+Project: Articloke – A platform for article readers (4 members) 
+• Technology: Servlet, Java Server Page, Bootstrap4, SQL Server 2019 
+• Responsibilities: 
+         I was the Scrum Master, Technical Leader and also Back-end Developer of team. 
+               ○ I am the person who arranged tasks to team members that are suitable to their capabilities. 
+               ○ I am the architecture responsible, constructed the core database, and navigated the team to a 
+coding style. 
+               ○ I was also a person who support my team in several aspects, especially in APIs and SQL Queries. 
+ADDITIONAL EXPERIENCES AND AWARDS 
+Awards 
+Outstanding Ones 
+• 8/2020: Achieve the FPT 100% Scholarship (78/105 Points) 
+• 9/2022: Achieve the First Prize in the FPT Olympiad Mathematic Contest 
+Additional Ones 
+• Achieve Honorable Awards FPT University (Summer 2021, Fall 2021, Spring 2022, Summer 2022) 
+• Achieve prizes in Mathematics Contests 
+                       ○ Second Prize in the Violympic Contest 
+                        ○ Salutatorian(2nd) in Le Quy Don Gifted High School Input Exam 
+                        ○ 3rd prizes in District Eхcellent Student Eхams (year 2019, 2022) 
+                        ○ Team member of Vietnamese National Olympiad 
+ 
+Skills 
+• Programming Language: Java, C#, SQL 
+• Framework: Bootstrap4 (CSS, JS), Entity Framework (C#), Spring Boot, Hibernate (Java) 
+• Tools: Visual Studio; Microsoft SQL Server, Jetbrains, Visual Studio 
+• Version control: Git, Github 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+
+
