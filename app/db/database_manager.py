@@ -6,7 +6,7 @@ from chromadb.config import Settings
 from models.models import Base, Candidate, WorkExperience, RawCV
 
 def init_db():
-    DATABASE_URL = os.getenv("DATABASE_URL", "postgresql://user:password@localhost:5432/cv_database")
+    DATABASE_URL = os.getenv("DATABASE_URL", "postgresql://postgres:12345@localhost:5432/cv_database")
     engine = create_engine(DATABASE_URL)
     Base.metadata.create_all(engine)
     return sessionmaker(bind=engine)()

@@ -1,7 +1,7 @@
 import fitz  # PyMuPDF
-import google.generativeai as genai
 import os
 import json
+import requests
 
 def extract_text_from_pdf(file):
     pdf_document = fitz.open(stream=file.file.read(), filetype="pdf")
@@ -17,9 +17,7 @@ def extract_text_from_pdf(file):
     return text
 
 def process_cv_to_json(raw_text):
-    genai.configure(api_key=os.getenv("GEMINI_API_KEY"))
-    model = genai.GenerativeModel('gemini-1.5-pro')
-    
+    # Use local Llama model via Ollama
     prompt = f"""
     Convert the following CV text into a structured JSON format with these fields:
     - name: string
@@ -34,8 +32,12 @@ def process_cv_to_json(raw_text):
     
     Return only the JSON object.
     """
-    response = model.generate_content(prompt)
+    response = requests.post(
+        "http://localhost:11434/api/generate",
+        json={"model": "llama3", "prompt": prompt}
+    )
+    result = response.json()["response"]
     try:
-        return json.loads(response.text.strip())
+        return json.loads(result.strip())
     except:
         raise ValueError("Failed to parse CV content")

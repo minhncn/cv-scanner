@@ -1,13 +1,18 @@
+from datetime import datetime
+import json
 from fastapi import UploadFile, HTTPException, Form
 from fastapi.responses import JSONResponse
+from sqlalchemy.orm import Session
+
 from db.database_manager import init_db, init_chromadb
+from models.models import Candidate, WorkExperience, RawCV
 from services.cv_processor import extract_text_from_pdf, process_cv_to_json
 from services.get_file_google_drive import download_pdf_from_google_drive, extract_drive_file_id
-from models.models import Candidate, WorkExperience, RawCV
-import json
+from services.ollama_cv import process_cv_with_ollama
 
 session = init_db()
 chroma_collection = init_chromadb()
+
 
 def handle_upload_cv(file: UploadFile):
     if not file.filename.endswith('.pdf'):
@@ -49,6 +54,7 @@ def handle_upload_cv(file: UploadFile):
     )
     session.commit()
     return {"status": "success", "candidate_id": candidate.id}
+
 
 def handle_upload_cv_from_drive(google_drive_url: str):
     try:
@@ -100,6 +106,54 @@ def handle_upload_cv_from_drive(google_drive_url: str):
     session.commit()
     return {"status": "success", "candidate_id": candidate.id}
 
+
+def handle_upload_cv_with_ollama(file: UploadFile, db: Session):
+    try:
+        # Extract text from PDF
+        raw_text = extract_text_from_pdf(file)
+        
+        # Process with Ollama
+        cv_data = process_cv_with_ollama(raw_text)
+        
+        # Create candidate record
+        candidate = Candidate(
+            name=cv_data["name"],
+            email=cv_data["email"],
+            phone=cv_data["phone"],
+            education=json.dumps(cv_data["education"]),  # Store as JSON string
+            skills=json.dumps(cv_data["skills"]),        # Store as JSON string
+            created_at=datetime.utcnow()
+        )
+        db.add(candidate)
+        db.flush()  # Get candidate.id before adding related records
+        
+        # Save raw CV text
+        raw_cv = RawCV(
+            candidate_id=candidate.id,
+            raw_text=raw_text,
+            source_path=file.filename,
+            created_at=datetime.utcnow()
+        )
+        db.add(raw_cv)
+        
+        # Save work experiences
+        for exp in cv_data.get("work_experience", []):
+            work_exp = WorkExperience(
+                candidate_id=candidate.id,
+                company=exp["company"],
+                position=exp["position"],
+                start_date=exp["start_date"],
+                end_date=exp["end_date"],
+                description=exp["description"]
+            )
+            db.add(work_exp)
+        
+        db.commit()
+        return {"message": "CV processed successfully", "candidate_id": candidate.id}
+    except Exception as e:
+        db.rollback()
+        raise HTTPException(status_code=500, detail=f"Error processing CV: {e}")
+    
 def handle_search_candidates(search):
     results = chroma_collection.query(
         query_texts=[search.query],
