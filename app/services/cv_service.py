@@ -107,7 +107,7 @@ def handle_upload_cv_from_drive(google_drive_url: str):
     return {"status": "success", "candidate_id": candidate.id}
 
 
-def handle_upload_cv_with_ollama(file: UploadFile, db: Session):
+def handle_upload_cv_with_ollama(file: UploadFile):
     try:
         # Extract text from PDF
         raw_text = extract_text_from_pdf(file)
@@ -124,8 +124,8 @@ def handle_upload_cv_with_ollama(file: UploadFile, db: Session):
             skills=json.dumps(cv_data["skills"]),        # Store as JSON string
             created_at=datetime.utcnow()
         )
-        db.add(candidate)
-        db.flush()  # Get candidate.id before adding related records
+        session.add(candidate)
+        session.flush()  # Get candidate.id before adding related records
         
         # Save raw CV text
         raw_cv = RawCV(
@@ -134,7 +134,7 @@ def handle_upload_cv_with_ollama(file: UploadFile, db: Session):
             source_path=file.filename,
             created_at=datetime.utcnow()
         )
-        db.add(raw_cv)
+        session.add(raw_cv)
         
         # Save work experiences
         for exp in cv_data.get("work_experience", []):
@@ -146,12 +146,12 @@ def handle_upload_cv_with_ollama(file: UploadFile, db: Session):
                 end_date=exp["end_date"],
                 description=exp["description"]
             )
-            db.add(work_exp)
+            session.add(work_exp)
         
-        db.commit()
+        session.commit()
         return {"message": "CV processed successfully", "candidate_id": candidate.id}
     except Exception as e:
-        db.rollback()
+        session.rollback()
         raise HTTPException(status_code=500, detail=f"Error processing CV: {e}")
     
 def handle_search_candidates(search):

@@ -25,5 +25,5 @@ async def search_candidates(search: CandidateSearch):
     return handle_search_candidates(search)
 
 @router.post("/upload_cv_ollama/")
-async def upload_cv_ollama(file: UploadFile = File(...), db: Session = Depends(init_db)):
-    return handle_upload_cv_with_ollama(file, db)
+async def upload_cv_ollama(file: UploadFile = File(...)):
+    return handle_upload_cv_with_ollama(file)
