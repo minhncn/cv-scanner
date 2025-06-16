@@ -2,7 +2,7 @@ from fastapi import APIRouter, UploadFile, File, HTTPException, Form, Depends
 from fastapi.responses import JSONResponse
 from pydantic import BaseModel
 import logging
-from services.cv_service import handle_upload_cv, handle_upload_cv_from_drive, handle_search_candidates, handle_upload_cv_with_ollama
+from services.cv_service import handle_upload_cv, handle_upload_cv_from_drive, handle_search_candidates, handle_upload_cv_with_ollama, get_all_candidates
 from db.database_manager import init_db
 from sqlalchemy.orm import Session
 
@@ -27,3 +27,7 @@ async def search_candidates(search: CandidateSearch):
 @router.post("/upload_cv_ollama/")
 async def upload_cv_ollama(file: UploadFile = File(...)):
     return handle_upload_cv_with_ollama(file)
+
+@router.get("/candidates/")
+async def get_candidates():
+    return get_all_candidates()

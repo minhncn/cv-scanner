@@ -114,14 +114,24 @@ def handle_upload_cv_with_ollama(file: UploadFile):
         
         # Process with Ollama
         cv_data = process_cv_with_ollama(raw_text)
-        
+
+        # Ensure education is stored as JSON string
+        education = cv_data["education"]
+        if not isinstance(education, str):
+            education = json.dumps(education)
+
+        # Ensure skills is stored as JSON string
+        skills = cv_data["skills"]
+        if not isinstance(skills, str):
+            skills = json.dumps(skills)
+
         # Create candidate record
         candidate = Candidate(
             name=cv_data["name"],
             email=cv_data["email"],
             phone=cv_data["phone"],
-            education=json.dumps(cv_data["education"]),  # Store as JSON string
-            skills=json.dumps(cv_data["skills"]),        # Store as JSON string
+            education=education,  # Store as JSON string
+            skills=skills,        # Store as JSON string
             created_at=datetime.utcnow()
         )
         session.add(candidate)
@@ -211,4 +221,32 @@ def handle_search_candidates(search):
         })
     
     print("Final response size:", len(response))
+    return JSONResponse(content=response)
+
+def get_all_candidates():
+    candidates = session.query(Candidate).all()
+    response = []
+    for candidate in candidates:
+        work_exps = session.query(WorkExperience).filter(WorkExperience.candidate_id == candidate.id).all()
+        try:
+            skills = json.loads(candidate.skills)
+        except Exception:
+            skills = []
+        response.append({
+            "id": candidate.id,
+            "name": candidate.name,
+            "email": candidate.email,
+            "phone": candidate.phone,
+            "education": candidate.education,
+            "skills": skills,
+            "work_experience": [
+                {
+                    "company": exp.company,
+                    "position": exp.position,
+                    "start_date": exp.start_date,
+                    "end_date": exp.end_date,
+                    "description": exp.description
+                } for exp in work_exps
+            ]
+        })
     return JSONResponse(content=response)
