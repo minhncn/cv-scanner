@@ -155,22 +155,50 @@ def handle_upload_cv_with_ollama(file: UploadFile):
         raise HTTPException(status_code=500, detail=f"Error processing CV: {e}")
     
 def handle_search_candidates(search):
+    # Step 1: Query Chroma
+    print(f"Searching Chroma with query: {search.query}, max_results: {search.max_results}")
     results = chroma_collection.query(
         query_texts=[search.query],
         n_results=search.max_results
     )
-    candidate_ids = [int(meta['candidate_id']) for meta in results['metadatas'][0]]
+    print("Chroma results:", results)
+
+    # Step 2: Extract candidate IDs
+    candidate_ids = []
+    for meta in results['metadatas'][0]:
+        try:
+            candidate_ids.append(int(meta['candidate_id']))
+        except (ValueError, KeyError) as e:
+            print(f"Invalid metadata: {meta}, Error: {e}")
+    print("Candidate IDs:", candidate_ids)
+
+    # Step 3: Query candidates from DB
+    if not candidate_ids:
+        print("No candidate IDs found, returning empty response")
+        return JSONResponse(content=[])
+    
     candidates = session.query(Candidate).filter(Candidate.id.in_(candidate_ids)).all()
+    print(f"Retrieved {len(candidates)} candidates from DB")
+
+    # Step 4: Construct response
     response = []
     for candidate in candidates:
         work_exps = session.query(WorkExperience).filter(WorkExperience.candidate_id == candidate.id).all()
+        print(f"Candidate {candidate.id} has {len(work_exps)} work experiences")
+        
+        try:
+            skills = json.loads(candidate.skills)
+        except json.JSONDecodeError as e:
+            print(f"Invalid JSON in skills for candidate {candidate.id}: {candidate.skills}")
+            skills = []
+        
         response.append({
             "id": candidate.id,
             "name": candidate.name,
             "email": candidate.email,
             "phone": candidate.phone,
             "education": candidate.education,
-            "skills": json.loads(candidate.skills),
+            "skills": skills,
             "work_experience": [
                 {
                     "company": exp.company,
@@ -181,4 +209,6 @@ def handle_search_candidates(search):
                 } for exp in work_exps
             ]
         })
+    
+    print("Final response size:", len(response))
     return JSONResponse(content=response)
